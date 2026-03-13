@@ -58,8 +58,8 @@ I'm a software engineer passionate about building real‑world software solution
 <p align="start">
   <img src="https://img.shields.io/badge/Docker-2C1B47?style=for-the-badge&logo=docker&logoColor=2496ED" />
   <img src="https://img.shields.io/badge/Kubernetes-2C1B47?style=for-the-badge&logo=kubernetes&logoColor=326CE5" />
-  <img src="https://img.shields.io/badge/AWS-2C1B47?style=for-the-badge&logo=amazon-aws&logoColor=FF9900" />
-  <img src="https://img.shields.io/badge/Azure-2C1B47?style=for-the-badge&logo=microsoft-azure&logoColor=0089D6" />
+  <img src="https://img.shields.io/badge/Amozon AWS-2C1B47?style=for-the-badge&logo=amazon-aws&logoColor=FF9900" />
+  <img src="https://img.shields.io/badge/Microsoft Azure-2C1B47?style=for-the-badge&logo=microsoft-azure&logoColor=0089D6" />
   <img src="https://img.shields.io/badge/Git-2C1B47?style=for-the-badge&logo=git&logoColor=F05032" />
   <img src="https://img.shields.io/badge/GitHub-2C1B47?style=for-the-badge&logo=github&logoColor=white" />
 </p>
