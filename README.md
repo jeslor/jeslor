@@ -69,16 +69,24 @@ I'm a software engineer passionate about building real‑world software solution
   <img src="https://img.shields.io/badge/c-2C1B47?style=for-the-badge&logo=c&logoColor=2496ED" />
 </p>
 
+<table align="start" border="0" cellspacing="0" cellpadding="0" style="border-collapse: collapse;">
 
-<p align="start" style="background-color: #1A0F2E; border: none; padding: 20px 0;">
-      <br />
-<img src="https://github-readme-stats-fast.vercel.app/api?username=jeslor&show_icons=true&theme=dark&bg_color=1A0F2E&title_color=BB86FC&text_color=FFFFFF&icon_color=BB86FC&hide_border=true&count_private=true" alt="GitHub Stats" height="170"/>
-      &nbsp;&nbsp;
-      <img src="https://streak-stats.demolab.com/?user=jeslor&theme=dark&background=1A0F2E&ring=BB86FC&fire=FF4500&currStreakNum=FFFFFF&sideNums=FFFFFF&sideLabels=A0A0A0&dates=A0A0A0&hide_border=true&hide_current_streak=false" alt="GitHub Streak" height="170"/>
-      <br /><br />
-</p>
+  <tr>
+    <td style="border: none; padding: 10px;">
+      <img 
+        src="https://github-readme-stats-fast.vercel.app/api?username=jeslor&show_icons=true&theme=dark&bg_color=1A0F2E&title_color=BB86FC&text_color=FFFFFF&icon_color=BB86FC&hide_border=true&count_private=true" 
+        height="170"
+      />
+    </td>
+    <td style="border: none; padding: 10px;">
+    <img 
+        src="https://github-readme-stats-fast.vercel.app/api/top-langs/?username=jeslor&layout=compact&theme=dark&bg_color=1A0F2E&title_color=BB86FC&text_color=FFFFFF&hide_border=true&langs_count=8" 
+        height="170"
+      />
+    </td>
+  </tr>
 
-
+</table>
 
 ## 🧩 Fun Fact
 
