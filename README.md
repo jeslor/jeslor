@@ -12,14 +12,12 @@
 
 ## 👨‍💻 About Me
 
-I'm a software engineer passionate about building real‑world software solutions that solve real world problems and delight users. I specialize in:
+I am a **Senior Full-Stack Engineer** specializing in robust backend architectures, distributed systems, and cloud-native applications. 
 
-- Full‑stack web development  
-- Scalable backend services  
-- Intuitive, accessible frontends  
-- Cross‑platform mobile apps  
-- Clean, maintainable code
-
+* 📈 **Proven Scale:** Developed backend services and platforms supporting **200,000+ users**.
+* ⚙️ **Efficiency:** Architected systems that optimized internal corporate workflows by **38%**.
+* 🛡️ **Resilience:** Engineered offline-first, data-sync tools designed for low-connectivity environments.
+* 🤖 **Innovation:** Built air-gapped Retrieval-Augmented Generation (RAG) platforms using local LLMs.
 
 
 ## 🧰 Tech Stack
