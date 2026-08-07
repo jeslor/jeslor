@@ -12,7 +12,7 @@
 
 ## 👨‍💻 About Me
 
-I am a **Senior Full-Stack Engineer** specializing in robust backend architectures, distributed systems, and cloud-native applications. 
+I am a **Senior Senior Backend Engineer** building scalable cloud-native and AI-powered applications with Node.js, Python & TypeScript.
 
 * 📈 **Proven Scale:** Developed backend services and platforms supporting **200,000+ users**.
 * ⚙️ **Efficiency:** Architected systems that optimized internal corporate workflows by **38%**.
