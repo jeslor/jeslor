@@ -199,9 +199,9 @@ function computeStreaks(days) {
 function levelFor(count, max) {
   if (count <= 0) return 0;
   const ratio = count / Math.max(1, max);
-  if (ratio > 0.75) return 4;
-  if (ratio > 0.5) return 3;
-  if (ratio > 0.25) return 2;
+  if (ratio >= 0.65) return 4;
+  if (ratio >= 0.4) return 3;
+  if (ratio >= 0.15) return 2;
   return 1;
 }
 
@@ -375,10 +375,7 @@ function buildHeatmapSvg(theme, calendar) {
 
   <rect x="0" y="0" width="${WIDTH}" height="46" fill="${t.panel}"/>
   <line x1="0" y1="46" x2="${WIDTH}" y2="46" stroke="${t.leader}" stroke-width="1"/>
-  <circle cx="26" cy="23" r="6.5" fill="#FF5F56"/>
-  <circle cx="47" cy="23" r="6.5" fill="#FFBD2E"/>
-  <circle cx="68" cy="23" r="6.5" fill="#27C93F"/>
-  <text x="92" y="28" class="heat-term">${USERNAME}@github ~ % ./contributions.sh --year</text>
+  <text x="24" y="28" class="heat-term">${USERNAME}@github ~ % ./contributions.sh --year</text>
   <text x="${WIDTH - 24}" y="28" text-anchor="end" class="heat-stats"><tspan class="heat-accent">${calendar.totalContributions.toLocaleString()}</tspan> contributions · streak <tspan class="heat-accent">${current}d</tspan> · best <tspan class="heat-accent">${longest}d</tspan></text>
 
   ${monthsSvg}
