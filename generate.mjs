@@ -215,16 +215,24 @@ function buildProbeBeam(t, gridX, gridY, cell, step, weeks, max, laneY, dur) {
   const gridW = weeks.length * step;
   const xStart = gridX + 10;
   const xEnd = gridX + gridW - 10;
-  const greenColor = t.heat[t.heat.length - 1];
   const topY = gridY + cell / 2;
 
+  // Any column whose peak day is at least "bright blue" (level 3) or
+  // "green" (level 4) gets a beam that grows/shrinks to meet that exact
+  // box; quieter columns just get a thin default probe to the top row.
   const columnTargets = weeks.map((week) => {
     let best = null;
     week.contributionDays.forEach((day) => {
       if (!best || day.contributionCount > best.contributionCount) best = day;
     });
-    const isGreen = Boolean(best && levelFor(best.contributionCount, max) === 4);
-    return { y: isGreen ? gridY + best.weekday * step + cell / 2 : topY, green: isGreen };
+    const level = best ? levelFor(best.contributionCount, max) : 0;
+    const hit = level >= 3;
+    return {
+      y: hit ? gridY + best.weekday * step + cell / 2 : topY,
+      color: hit ? t.heat[level] : t.accent,
+      width: level === 4 ? "2.6" : level === 3 ? "2" : "1.1",
+      dot: level === 4 ? "3.4" : level === 3 ? "2.6" : "1.6",
+    };
   });
 
   const events = [];
@@ -247,9 +255,9 @@ function buildProbeBeam(t, gridX, gridY, cell, step, weeks, max, laneY, dur) {
     if (ct <= last) ct = Math.min(1, last + 0.0006);
     keyTimes.push(ct.toFixed(4));
     y2Values.push((-(laneY - target.y)).toFixed(1));
-    colorValues.push(target.green ? greenColor : t.accent);
-    widthValues.push(target.green ? "2.6" : "1.1");
-    dotValues.push(target.green ? "3.4" : "1.6");
+    colorValues.push(target.color);
+    widthValues.push(target.width);
+    dotValues.push(target.dot);
     last = ct;
   });
   const kt = keyTimes.join(";");
