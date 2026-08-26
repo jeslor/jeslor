@@ -58,7 +58,7 @@
   <!-- footer -->
   <line x1="40" y1="616" x2="1140" y2="616" stroke="#1E293B" stroke-width="1"/>
   <text x="40" y="637" class="foot">Live GitHub stats + tech stack badges below ↓</text>
-  <text x="1140" y="637" text-anchor="end" class="foot">synced 2026-08-26 06:51 UTC</text>
+  <text x="1140" y="637" text-anchor="end" class="foot">synced 2026-08-26 07:00 UTC</text>
 </g>
 
 <rect x="1" y="1" width="1178" height="650" rx="14" fill="none" stroke="url(#borderGrad)" stroke-width="2" filter="url(#softGlow)"/>
