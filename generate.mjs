@@ -409,12 +409,12 @@ function buildSections(stats) {
     {
       title: "SYSTEM.INFO",
       lines: [
-        kv("Subject", "Jeslor Ssozi"),
+        kv("Name", "Jeslor Ssozi"),
         kv("Role", "Senior Backend Engineer"),
         kv("Focus", "Cloud-native & AI-powered systems"),
-        kv("Impact", "200,000+ users served"),
+        kv("Impact", "Systems serving 200,000+ users"),
         kv("Efficiency", "38% workflow optimization"),
-        kv("Specialty", "Offline-first sync · Air-gapped RAG"),
+        kv("Specialty", "Backend Engineering"),
         kv("Status", "Open to collaboration"),
       ],
     },
