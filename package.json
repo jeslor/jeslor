@@ -1,0 +1,14 @@
+{
+  "name": "jeslor-profile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generates the animated terminal-style SVG cards for the GitHub profile README.",
+  "type": "module",
+  "scripts": {
+    "generate": "node generate.mjs"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "jimp": "^1.6.1"
+  }
+}
