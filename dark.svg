@@ -15,6 +15,11 @@
   <pattern id="scanlines" width="3" height="3" patternUnits="userSpaceOnUse">
     <rect width="3" height="1" fill="#7DD3FC" opacity="0.045"/>
   </pattern>
+  <linearGradient id="scanBeam" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#7DD3FC" stop-opacity="0"/>
+    <stop offset="50%" stop-color="#7DD3FC" stop-opacity="0.22"/>
+    <stop offset="100%" stop-color="#7DD3FC" stop-opacity="0"/>
+  </linearGradient>
   <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
     <feGaussianBlur stdDeviation="3" result="blur"/>
     <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -58,7 +63,16 @@
   <!-- footer -->
   <line x1="40" y1="616" x2="1140" y2="616" stroke="#1E293B" stroke-width="1"/>
   <text x="40" y="637" class="foot">Live GitHub stats + tech stack badges below ↓</text>
-  <text x="1140" y="637" text-anchor="end" class="foot">synced 2026-08-26 07:00 UTC</text>
+  <text x="1140" y="637" text-anchor="end" class="foot">synced 2026-08-26 07:42 UTC</text>
+
+  <!-- scanning sweep -->
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0,-30; 0,682" dur="7s" repeatCount="indefinite"/>
+    <rect x="0" y="-18" width="1180" height="36" fill="url(#scanBeam)"/>
+    <line x1="0" y1="0" x2="1180" y2="0" stroke="#7DD3FC" stroke-width="1.5" opacity="0.95"/>
+    <circle cx="10" cy="0" r="2.5" fill="#7DD3FC" filter="url(#softGlow)"/>
+    <circle cx="1170" cy="0" r="2.5" fill="#7DD3FC" filter="url(#softGlow)"/>
+  </g>
 </g>
 
 <rect x="1" y="1" width="1178" height="650" rx="14" fill="none" stroke="url(#borderGrad)" stroke-width="2" filter="url(#softGlow)"/>

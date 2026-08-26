@@ -207,6 +207,89 @@ function levelFor(count, max) {
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+// A single probe beam rides with the jet at all times: x tracks the jet
+// (it's a child of the jet's translate group), and its length is keyed per
+// column — reaching the topmost row by default, or shrinking to meet a
+// green ("More" tier) cell when that column has real contributions to show.
+function buildProbeBeam(t, gridX, gridY, cell, step, weeks, max, laneY, dur) {
+  const gridW = weeks.length * step;
+  const xStart = gridX + 10;
+  const xEnd = gridX + gridW - 10;
+  const greenColor = t.heat[t.heat.length - 1];
+  const topY = gridY + cell / 2;
+
+  const columnTargets = weeks.map((week) => {
+    let best = null;
+    week.contributionDays.forEach((day) => {
+      if (!best || day.contributionCount > best.contributionCount) best = day;
+    });
+    const isGreen = Boolean(best && levelFor(best.contributionCount, max) === 4);
+    return { y: isGreen ? gridY + best.weekday * step + cell / 2 : topY, green: isGreen };
+  });
+
+  const events = [];
+  columnTargets.forEach((target, wi) => {
+    const x = gridX + wi * step + cell / 2;
+    const xFraction = Math.min(1, Math.max(0, (x - xStart) / (xEnd - xStart)));
+    events.push({ t: xFraction * 0.5, target });
+    events.push({ t: 0.5 + (1 - xFraction) * 0.5, target });
+  });
+  events.sort((a, b) => a.t - b.t);
+
+  const keyTimes = [];
+  const y2Values = [];
+  const colorValues = [];
+  const widthValues = [];
+  const dotValues = [];
+  let last = -1;
+  events.forEach(({ t: eventTime, target }) => {
+    let ct = Math.min(1, Math.max(0, eventTime));
+    if (ct <= last) ct = Math.min(1, last + 0.0006);
+    keyTimes.push(ct.toFixed(4));
+    y2Values.push((-(laneY - target.y)).toFixed(1));
+    colorValues.push(target.green ? greenColor : t.accent);
+    widthValues.push(target.green ? "2.6" : "1.1");
+    dotValues.push(target.green ? "3.4" : "1.6");
+    last = ct;
+  });
+  const kt = keyTimes.join(";");
+
+  return `
+    <line x1="0" y1="0" x2="0" y2="${y2Values[0]}" stroke="${colorValues[0]}" stroke-width="${widthValues[0]}" stroke-linecap="round" opacity="0.85">
+      <animate attributeName="y2" dur="${dur}s" repeatCount="indefinite" keyTimes="${kt}" values="${y2Values.join(";")}"/>
+      <animate attributeName="stroke" dur="${dur}s" repeatCount="indefinite" keyTimes="${kt}" values="${colorValues.join(";")}"/>
+      <animate attributeName="stroke-width" dur="${dur}s" repeatCount="indefinite" keyTimes="${kt}" values="${widthValues.join(";")}"/>
+    </line>
+    <circle cx="0" cy="${y2Values[0]}" r="${dotValues[0]}" fill="${colorValues[0]}">
+      <animate attributeName="cy" dur="${dur}s" repeatCount="indefinite" keyTimes="${kt}" values="${y2Values.join(";")}"/>
+      <animate attributeName="fill" dur="${dur}s" repeatCount="indefinite" keyTimes="${kt}" values="${colorValues.join(";")}"/>
+      <animate attributeName="r" dur="${dur}s" repeatCount="indefinite" keyTimes="${kt}" values="${dotValues.join(";")}"/>
+    </circle>`;
+}
+
+function buildJetLane(t, gridX, gridY, cell, gap, weeks, max, laneY, dur = 13) {
+  const step = cell + gap;
+  const gridW = weeks.length * step;
+  const xStart = gridX + 10;
+  const xEnd = gridX + gridW - 10;
+  const beam = buildProbeBeam(t, gridX, gridY, cell, step, weeks, max, laneY, dur);
+
+  return `
+  <line x1="${gridX}" y1="${laneY}" x2="${gridX + gridW}" y2="${laneY}" stroke="${t.leader}" stroke-width="1" stroke-dasharray="2 4" opacity="0.5"/>
+  <g filter="url(#hSoftGlow)">
+    <animateTransform attributeName="transform" type="translate" dur="${dur}s" repeatCount="indefinite"
+      keyTimes="0;0.5;1" values="${xStart},${laneY}; ${xEnd},${laneY}; ${xStart},${laneY}"/>
+    ${beam}
+    <g transform="scale(1.4)">
+      <ellipse cx="0" cy="0" rx="14" ry="6" fill="url(#jetGlow)"/>
+      <circle cx="-7.5" cy="0" r="2" fill="${t.border2}"><animate attributeName="opacity" values="0.35;1;0.35" dur="0.9s" repeatCount="indefinite"/></circle>
+      <circle cx="7.5" cy="0" r="2" fill="${t.border2}"><animate attributeName="opacity" values="1;0.35;1" dur="0.9s" repeatCount="indefinite"/></circle>
+      <path d="M-9,0 L-3,-5 L3,-5 L9,0 L3,5 L-3,5 Z" fill="${t.accent}" stroke="${t.border1}" stroke-width="1"/>
+      <circle cx="0" cy="0" r="2.2" fill="#FFFFFF"/>
+    </g>
+  </g>`;
+}
+
 function buildHeatmapSvg(theme, calendar) {
   const t = theme;
   const weeks = calendar.weeks;
@@ -219,8 +302,10 @@ function buildHeatmapSvg(theme, calendar) {
   const gridX = 46;
   const gridY = 74;
   const gridW = weeks.length * (cell + gap);
+  const jetLaneH = 52;
   const WIDTH = gridX + gridW + 30;
-  const HEIGHT = gridY + 7 * (cell + gap) + 46;
+  const HEIGHT = gridY + 7 * (cell + gap) + jetLaneH + 46;
+  const jetLaneY = gridY + 7 * (cell + gap) + jetLaneH / 2 + 10;
 
   let cellsSvg = "";
   let monthsSvg = "";
@@ -270,6 +355,10 @@ function buildHeatmapSvg(theme, calendar) {
     <feGaussianBlur stdDeviation="3" result="blur"/>
     <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
   </filter>
+  <radialGradient id="jetGlow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%" stop-color="${t.accent}" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="${t.accent}" stop-opacity="0"/>
+  </radialGradient>
   <clipPath id="hFrameClip"><rect x="1" y="1" width="${WIDTH - 2}" height="${HEIGHT - 2}" rx="14"/></clipPath>
   <style>
     .heat-term { fill: ${t.textDim}; font-size: 13px; }
@@ -295,6 +384,7 @@ function buildHeatmapSvg(theme, calendar) {
   ${monthsSvg}
   ${dayLabels}
   ${cellsSvg}
+  ${buildJetLane(t, gridX, gridY, cell, gap, weeks, max, jetLaneY)}
 
   <text x="${legendX}" y="${HEIGHT - 14}" class="heat-legend">Less</text>
   ${legend}
@@ -405,6 +495,11 @@ function buildSvg(theme, asciiRows, stats, updatedAt) {
   <pattern id="scanlines" width="3" height="3" patternUnits="userSpaceOnUse">
     <rect width="3" height="1" fill="${t.scan}" opacity="0.045"/>
   </pattern>
+  <linearGradient id="scanBeam" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="${t.scan}" stop-opacity="0"/>
+    <stop offset="50%" stop-color="${t.scan}" stop-opacity="0.22"/>
+    <stop offset="100%" stop-color="${t.scan}" stop-opacity="0"/>
+  </linearGradient>
   <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
     <feGaussianBlur stdDeviation="3" result="blur"/>
     <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
@@ -449,6 +544,15 @@ function buildSvg(theme, asciiRows, stats, updatedAt) {
   <line x1="${PANEL_X}" y1="${HEIGHT - 36}" x2="${WIDTH - PANEL_X}" y2="${HEIGHT - 36}" stroke="${t.leader}" stroke-width="1"/>
   <text x="${PANEL_X}" y="${HEIGHT - 15}" class="foot">Live GitHub stats + tech stack badges below ↓</text>
   <text x="${WIDTH - PANEL_X}" y="${HEIGHT - 15}" text-anchor="end" class="foot">synced ${updatedAt}</text>
+
+  <!-- scanning sweep -->
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="0,-30; 0,${HEIGHT + 30}" dur="7s" repeatCount="indefinite"/>
+    <rect x="0" y="-18" width="${WIDTH}" height="36" fill="url(#scanBeam)"/>
+    <line x1="0" y1="0" x2="${WIDTH}" y2="0" stroke="${t.scan}" stroke-width="1.5" opacity="0.95"/>
+    <circle cx="10" cy="0" r="2.5" fill="${t.scan}" filter="url(#softGlow)"/>
+    <circle cx="${WIDTH - 10}" cy="0" r="2.5" fill="${t.scan}" filter="url(#softGlow)"/>
+  </g>
 </g>
 
 <rect x="1" y="1" width="${WIDTH - 2}" height="${HEIGHT - 2}" rx="14" fill="none" stroke="url(#borderGrad)" stroke-width="2" filter="url(#softGlow)"/>
