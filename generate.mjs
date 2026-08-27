@@ -35,6 +35,7 @@ const THEMES = {
     textDim: "#64748B",
     leader: "#1E293B",
     scan: "#7DD3FC",
+    marker: "#FDE047",
     heat: ["#101826", "#0C4A6E", "#0369A1", "#22D3EE", "#34D399"],
   },
   light: {
@@ -51,6 +52,7 @@ const THEMES = {
     textDim: "#64748B",
     leader: "#E2E8F0",
     scan: "#0EA5E9",
+    marker: "#D97706",
     heat: ["#E7ECF3", "#BAE6FD", "#38BDF8", "#0284C7", "#059669"],
   },
 };
@@ -207,6 +209,9 @@ function levelFor(count, max) {
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+// Seconds for one full there-and-back sweep of the jet / probe line.
+const JET_DUR = 17;
+
 // A single probe beam rides with the jet at all times: x tracks the jet
 // (it's a child of the jet's translate group), and its length is keyed per
 // column — reaching the topmost row by default, or shrinking to meet a
@@ -275,7 +280,66 @@ function buildProbeBeam(t, gridX, gridY, cell, step, weeks, max, laneY, dur) {
     </circle>`;
 }
 
-function buildJetLane(t, gridX, gridY, cell, gap, weeks, max, laneY, dur = 13) {
+// Opacity keyframes for a marker that is hidden except for the brief moment
+// the probe line's tip is actually over its box. The jet crosses every column
+// twice per cycle (once out, once back), so each column gets two short pulses
+// timed to exactly the fractions used by buildProbeBeam's event schedule.
+function beamTouchOpacity(xFraction, dur) {
+  const w = 0.02; // half-width of the touch pulse, as a fraction of the cycle
+  const centers = [xFraction * 0.5, 0.5 + (1 - xFraction) * 0.5];
+  const pts = [[0, 0], [1, 0]];
+  centers.forEach((c) => {
+    pts.push([c - w, 0], [c - w * 0.3, 1], [c + w * 0.3, 1], [c + w, 0]);
+  });
+  pts.forEach((p) => { p[0] = Math.min(1, Math.max(0, p[0])); });
+  pts.sort((a, b) => a[0] - b[0]);
+
+  const keyTimes = [];
+  const values = [];
+  let last = -1;
+  pts.forEach(([time, op]) => {
+    if (time <= last) {
+      if (op > values[values.length - 1]) values[values.length - 1] = op;
+      return;
+    }
+    keyTimes.push(time.toFixed(4));
+    values.push(op);
+    last = time;
+  });
+  if (keyTimes[0] !== "0.0000") { keyTimes.unshift("0.0000"); values.unshift(0); }
+  if (keyTimes[keyTimes.length - 1] !== "1.0000") { keyTimes.push("1.0000"); values.push(0); }
+
+  return `<animate attributeName="opacity" dur="${dur}s" repeatCount="indefinite" keyTimes="${keyTimes.join(";")}" values="${values.join(";")}"/>`;
+}
+
+// Outlines the exact box each probe beam shrinks to meet — the peak day of
+// every column bright enough (level >= 3) to pull the beam off the top row.
+// The border is drawn in the theme's marker colour and only flashes on while
+// the moving line's tip is touching that box.
+function buildTargetMarkers(t, gridX, gridY, cell, gap, weeks, max, dur = JET_DUR) {
+  const step = cell + gap;
+  const gridW = weeks.length * step;
+  const xStart = gridX + 10;
+  const xEnd = gridX + gridW - 10;
+  let svg = "";
+  weeks.forEach((week, wi) => {
+    let best = null;
+    week.contributionDays.forEach((day) => {
+      if (!best || day.contributionCount > best.contributionCount) best = day;
+    });
+    const level = best ? levelFor(best.contributionCount, max) : 0;
+    if (level < 3) return;
+    const cx = gridX + wi * step + cell / 2;
+    const xFraction = Math.min(1, Math.max(0, (cx - xStart) / (xEnd - xStart)));
+    const x = (gridX + wi * step - 1.5).toFixed(1);
+    const y = (gridY + best.weekday * step - 1.5).toFixed(1);
+    const size = cell + 3;
+    svg += `<rect x="${x}" y="${y}" width="${size}" height="${size}" rx="3.5" fill="none" stroke="${t.marker}" stroke-width="1.4" opacity="0">${beamTouchOpacity(xFraction, dur)}</rect>`;
+  });
+  return svg;
+}
+
+function buildJetLane(t, gridX, gridY, cell, gap, weeks, max, laneY, dur = JET_DUR) {
   const step = cell + gap;
   const gridW = weeks.length * step;
   const xStart = gridX + 10;
@@ -389,6 +453,7 @@ function buildHeatmapSvg(theme, calendar) {
   ${monthsSvg}
   ${dayLabels}
   ${cellsSvg}
+  ${buildTargetMarkers(t, gridX, gridY, cell, gap, weeks, max)}
   ${buildJetLane(t, gridX, gridY, cell, gap, weeks, max, jetLaneY)}
 
   <text x="${legendX}" y="${HEIGHT - 14}" class="heat-legend">Less</text>
