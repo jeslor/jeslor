@@ -63,7 +63,7 @@
   <!-- footer -->
   <line x1="40" y1="616" x2="1140" y2="616" stroke="#E2E8F0" stroke-width="1"/>
   <text x="40" y="637" class="foot">Live GitHub stats + tech stack badges below ↓</text>
-  <text x="1140" y="637" text-anchor="end" class="foot">synced 2026-08-26 08:47 UTC</text>
+  <text x="1140" y="637" text-anchor="end" class="foot">synced 2026-08-27 09:10 UTC</text>
 
   <!-- scanning sweep -->
   <g>
